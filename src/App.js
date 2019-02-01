@@ -257,7 +257,7 @@ Footer = compose(
   // withTodos  
 )(Footer);
 
-// const ENDPOINT_URL = 'https://api.8base.com/cjrkt66qe000001ryzd3q4aiv'
+// const ENDPOINT_URL = 'YOUR_8BASE_ENDPOINT_URL'
 // const AUTH_CLIENT_ID = 'qGHZVu5CxY5klivm28OPLjopvsYp0baD';
 // const AUTH_DOMAIN = 'auth.8base.com';
 
@@ -344,13 +344,18 @@ class App extends Component {
         {/*<EightBaseAppProvider uri={ENDPOINT_URL} authClient={authClient} >
           {({ loading }) => loading ? <div>"Loading..."</div> : ( */}
             <div className="todoapp">
-              <Header createTodo={ this.createTodo } />
+              <Header 
+                  createTodo={ this.createTodo }            // Remove this
+              />
               <Main 
-                  todos={ this.state.todos }
-                  toggleAllTodos={ this.toggleAllTodos }                  
-                  toggleTodo={ this.toggleTodo }
-                  removeTodo={ this.removeTodo } />
-              <Footer todos={ this.state.todos } />
+                  todos={ this.state.todos }                // Remove this
+                  toggleAllTodos={ this.toggleAllTodos }    // Remove this
+                  toggleTodo={ this.toggleTodo }            // Remove this
+                  removeTodo={ this.removeTodo }            // Remove this
+                  />         
+              <Footer 
+                  todos={ this.state.todos }                // Remove this
+              />
             </div>
           {/*})}
         </EightBaseAppProvider>*/}
