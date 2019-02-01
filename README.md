@@ -186,20 +186,35 @@ Main = compose(
 ```
 
 **7. Toggle all todos**
-* Wrapp `App` in `withToggleTodo`
+* We only need a new HOC, we can reuse the mutation. All mutations in the loop will be batched in a single request.
 ```javascript
-App = withToggleTodo(App);
+const withToggleAllTodos = graphql(TOGGLE_TODO_MUTATION, {
+  props: ({ mutate, ownProps: { todos }}) => ({
+    toggleAllTodos: ({ completed }) => {      
+      todos.forEach((todo) => {
+        mutate({
+          variables: { id: todo.id, completed },
+          refetchQueries: [{ query: TODO_LIST_QUERY }]
+        });        
+      });      
+    }
+  })
+});
 ```
-
-* Change `toggleAllTodos` function in `App`
+* Wrap `Main` in `withToggleAllTodos`
 ```javascript
-toggleAllTodos = ({ completed }) => {
-  const { todos, toggleTodo } = this.state;
-  todos.forEach((todo) => {
-    toggleTodo({ id: todo.id, completed });
-  });
-  this.setState({ todos });
-}
+Main = compose(
+  withRouter,
+  withTodos,
+  withToggleTodo,
+  withToggleAllTodos // Add this
+)(Main);
+```
+* Remove `toggleAllTodos` from `App`
+```jsx
+<Main 
+    toggleAllTodos={ this.toggleAllTodos }  // Remove this
+    ...
 ```
 
 **8. Remove todo**

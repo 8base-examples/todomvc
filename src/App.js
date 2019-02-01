@@ -78,6 +78,19 @@ import "./App.css";
 //   })  
 // });
 
+// const withToggleAllTodos = graphql(TOGGLE_TODO_MUTATION, {
+//   props: ({ mutate, ownProps: { todos }}) => ({
+//     toggleAllTodos: ({ completed }) => {      
+//       todos.forEach((todo) => {
+//         mutate({
+//           variables: { id: todo.id, completed },
+//           refetchQueries: [{ query: TODO_LIST_QUERY }]
+//         });        
+//       });      
+//     }
+//   })
+// });
+
 // const DELETE_TODO_MUTATION = gql`
 //   mutation TodoDelete($id: ID!) {
 //     todoDelete(filter: { id: $id }) {
@@ -195,6 +208,7 @@ Main = compose(
   withRouter,
   // withTodos,
   // withToggleTodo,
+  // withToggleAllTodos,
   // withRemoveTodo
 )(Main);
 
@@ -292,15 +306,6 @@ class App extends Component {
     this.setState({ todos });
   }
 
-  // Replace with
-  // toggleAllTodos = ({ completed }) => {
-  //   const { todos, toggleTodo } = this.state;
-  //   todos.forEach((todo) => {
-  //     toggleTodo({ id: todo.id, completed });
-  //   });
-  //   this.setState({ todos });
-  // }
-
   toggleTodo = ({ id, completed }) => {
     const { todos } = this.state;
     todos.forEach((todo) => {
@@ -350,7 +355,7 @@ class App extends Component {
                   todos={ this.state.todos }                // Remove this                  
                   toggleTodo={ this.toggleTodo }            // Remove this
                   removeTodo={ this.removeTodo }            // Remove this
-                  toggleAllTodos={ this.toggleAllTodos }
+                  toggleAllTodos={ this.toggleAllTodos }    // Remove this
                   />         
               <Footer 
                   todos={ this.state.todos }                // Remove this
@@ -362,10 +367,5 @@ class App extends Component {
     );
   }
 }
-
-// App = compose(
-//   withTodos,
-//   withToggleTodo
-// )(App);
 
 export default App;
