@@ -1,6 +1,6 @@
 # 8base GraphQL + React Todo MVC
 
-This is completed [Todo MVC](http://todomvc.com/) app with 8base GraphQL backend. If you're looking for walkthrough checkout the [master](https://github.com/8base/MangoHacks) branch.
+This is completed [Todo MVC](http://todomvc.com/) app with 8base GraphQL backend. If you're looking for walkthrough on how to connect 8base GraphQL API checkout the [workshop](tree/workshop) branch.
 
 # Running the app
 1. Create [8base](https://www.8base.com/) account
