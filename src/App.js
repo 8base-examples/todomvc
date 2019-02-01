@@ -123,23 +123,30 @@ class Header extends Component {
   }
 }
 
-Header = withCreateTodo(Header);
+// Header = withCreateTodo(Header);
 
 
 class Main extends Component {
 
-  toggleAllTodos = ({ completed }) => {
-    const { todos, toggleTodo } = this.props;
-    todos.forEach((todo) => toggleTodo({ id: todo.id, completed }));
-  }
+  // toggleAllTodos = ({ completed }) => {
+  //   const { todos, toggleTodo } = this.props;
+  //   todos.forEach((todo) => toggleTodo({ id: todo.id, completed }));
+  // }
 
   render() {
     const {
       todos,
       toggleTodo,
       removeTodo,
+      toggleAllTodos, // remove this
       location
     } = this.props;
+
+    // const toggleAllTodos = ({ completed }) => {
+    //   const { todos, toggleTodo } = this.props;
+    //   todos.forEach((todo) => toggleTodo({ id: todo.id, completed }));
+    // }
+
     return todos && todos.length ? (
       <section className="main">
         <input
@@ -147,8 +154,8 @@ class Main extends Component {
           type="checkbox"
           onChange={() =>
             todos.some(todo => todo.completed === false)
-              ? this.toggleAllTodos({ completed: true })
-              : this.toggleAllTodos({ completed: false })
+              ? toggleAllTodos({ completed: true })
+              : toggleAllTodos({ completed: false })
           }
           checked={false}
         />
@@ -196,9 +203,9 @@ class Main extends Component {
 
 Main = compose(
   withRouter,
-  withTodos,
-  withToggleTodo,
-  withRemoveTodo
+  // withTodos,
+  // withToggleTodo,
+  // withRemoveTodo
 )(Main);
 
 class Footer extends Component {
@@ -247,34 +254,106 @@ class Footer extends Component {
 
 Footer = compose(
   withRouter,
-  withTodos  
+  // withTodos  
 )(Footer);
 
-const ENDPOINT_URL = 'https://api.8base.com/cjrkt66qe000001ryzd3q4aiv'
-const AUTH_CLIENT_ID = 'qGHZVu5CxY5klivm28OPLjopvsYp0baD';
-const AUTH_DOMAIN = 'auth.8base.com';
+// const ENDPOINT_URL = 'https://api.8base.com/cjrkt66qe000001ryzd3q4aiv'
+// const AUTH_CLIENT_ID = 'qGHZVu5CxY5klivm28OPLjopvsYp0baD';
+// const AUTH_DOMAIN = 'auth.8base.com';
 
-const authClient = new WebAuth0AuthClient({
-  domain: AUTH_DOMAIN,
-  clientId: AUTH_CLIENT_ID,
-  redirectUri: `${window.location.origin}/auth/callback`,
-  logoutRedirectUri: `${window.location.origin}/auth`,
-});
+// const authClient = new WebAuth0AuthClient({
+//   domain: AUTH_DOMAIN,
+//   clientId: AUTH_CLIENT_ID,
+//   redirectUri: `${window.location.origin}/auth/callback`,
+//   logoutRedirectUri: `${window.location.origin}/auth`,
+// });
 
 class App extends Component {
+
+  // Remove everything from here until...
+  constructor() {
+    super();
+    const todos = [
+      {
+        id: '1',
+        text: 'Todo 1',
+        completed: false
+      },
+      {
+        id: '2',
+        text: 'Todo 2',
+        completed: false
+      },
+      {
+        id: '3',
+        text: 'Todo 3',
+        completed: true
+      }
+    ];
+
+    this.state = { todos };
+  }
+
+  toggleAllTodos = ({ completed }) => {
+    const { todos } = this.state;
+    todos.forEach((todo) => {
+      todo.completed = completed;
+    });
+    this.setState({ todos });
+  }
+
+  toggleTodo = ({ id, completed }) => {
+    const { todos } = this.state;
+    todos.forEach((todo) => {
+      if (todo.id === id) {
+        todo.completed = completed;
+      }
+    });
+    this.setState({ todos });
+  }
+
+  removeTodo = (id) => {
+    let { todos } = this.state;
+    todos = todos.filter(( todo ) => {
+      return todo.id !== id;
+    });
+    this.setState({ todos });
+  }
+
+  createTodo = ({ text }) => {
+    let { todos } = this.state;
+    const lastTodo = todos[todos.length - 1];
+    let newTodoId = 1; 
+    if (lastTodo) {
+      newTodoId = parseInt(lastTodo.id, 10) + 1;
+    }
+    todos.push({
+      id: newTodoId.toString(),
+      text,
+      completed: false
+    });
+    this.setState({ todos });
+  }
+
+  // ...until here
 
   render() {
     return (
       <Router>
-        <EightBaseAppProvider uri={ENDPOINT_URL} authClient={authClient} >
-          {({ loading }) => loading ? <div>"Loading..."</div> : (
+        {/* Uncomment the code below */}
+        {/*<EightBaseAppProvider uri={ENDPOINT_URL} authClient={authClient} >
+          {({ loading }) => loading ? <div>"Loading..."</div> : ( */}
             <div className="todoapp">
-              <Header />
-              <Main />
-              <Footer />
+              <Header createTodo={ this.createTodo } />
+              <Main 
+                  todos={ this.state.todos }
+                  toggleAllTodos={ this.toggleAllTodos }                  
+                  toggleTodo={ this.toggleTodo }
+                  removeTodo={ this.removeTodo } />
+              <Footer todos={ this.state.todos } />
             </div>
-          )}
-        </EightBaseAppProvider>
+          {/*})}
+        </EightBaseAppProvider>*/}
       </Router>
     );
   }
