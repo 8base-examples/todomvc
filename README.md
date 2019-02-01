@@ -1,56 +1,241 @@
-# Apollo + React Todo MVC
+# 8base GraphQL + React Todo MVC
 
-1. `create-react-app apollo-todomvc`
-2. `yarn start`
+[Todo MVC](http://todomvc.com/) app with 8base GraphQL backend
 
-## [Spec](https://github.com/tastejs/todomvc/blob/master/app-spec.md#functionality)
 
-### ✅ No todos 
+# Preparing the environment
+1. Create [8base](https://www.8base.com/) account
+2. Create table `Todo` with fields `text` (field type: TEXT), `completed` (field type: SWITCH, format: Yes/No)
+3. Copy the API endpoint URL - you'll need it later where it says `8BASE_API_URL`
+4. Allow guest access to `Todo` table in Settings > Roles > Guest 
+5. Clone this repo 
+6. Install dependencies: 
+```
+yarn add @8base/app-provider @8base/web-auth0-auth-client graphql graphql-tag react-apollo && yarn
+```
+7. Test that the app works without backend: `yarn start`
+8. (optional) Setup VS Code [Apollo GraphQL](https://marketplace.visualstudio.com/items?itemName=apollographql.vscode-apollo) extension:
+Create file `apollo.config.js` in the root of the project with the following content:
+```javascript
+module.exports = {
+  client: {
+    service: {
+      name: '8base',
+      url: '8BASE_API_URL',
+    },
+    includes: [
+      "src/*.{ts,tsx,js,jsx}"
+    ]
+  },
+};
+```
 
-When there are no todos, `#main` and `#footer` should be hidden.
+# Connecting the backend
+1. Import graphql-related dependencies
+```javascript
+import gql from "graphql-tag";
+import { graphql } from "react-apollo";
+import { EightBaseAppProvider } from '@8base/app-provider';
+import { WebAuth0AuthClient } from '@8base/web-auth0-auth-client';
+```
 
-![No todos](./images/no_todos.png)
+2. Initialize auth
+```javascript
+const ENDPOINT_URL = 'YOUR_8BASE_ENDPOINT_URL'
+const AUTH_CLIENT_ID = 'qGHZVu5CxY5klivm28OPLjopvsYp0baD';
+const AUTH_DOMAIN = 'auth.8base.com';
 
-### ✅ New todo
+const authClient = new WebAuth0AuthClient({
+  domain: AUTH_DOMAIN,
+  clientId: AUTH_CLIENT_ID,
+  redirectUri: `${window.location.origin}/auth/callback`,
+  logoutRedirectUri: `${window.location.origin}/auth`,
+});
+```
 
-New todos are entered in the input at the top of the app. The input element should be focused when the page is loaded, preferably by using the `autofocus` input attribute. Pressing Enter creates the todo, appends it to the todo list, and clears the input. Make sure to `.trim()` the input and then check that it's not empty before creating a new todo.
+3. Wrap into `EightBaseAppProvider`
+```jsx
+<EightBaseAppProvider uri={ENDPOINT_URL} authClient={authClient} >
+  {({ loading }) => loading ? <div>"Loading..."</div> : (
+    <div className="todoapp">...</div>
+  })}
+</EightBaseAppProvider> 
+```
 
-![Add items](./images/add_items.png)
+4. Fetch todos
+* Query and HOC
+```javascript
+const TODO_LIST_QUERY = gql`
+  query TodoList {
+    todosList(orderBy: [completed_ASC, createdAt_DESC]) {
+      items {
+        id
+        text
+        completed
+      }
+    }
+  }
+`;
 
-### ✅ Mark all as complete
+const withTodos = graphql(TODO_LIST_QUERY, {
+  props: ({ data: { todosList: ({ items } = {}) } }) => {
+    return {
+      todos: items || []
+    };
+  },
+});
+```
+* Wrap `Main` and `Footer` into `withTodos`
+```javascript
+Main = compose(
+  withRouter,
+  withTodos // Add this
+)(Main);
+```
+```javascript
+Footer = compose(
+  withRouter,
+  withTodos // Add this
+)(Footer);
+```
 
-This checkbox toggles all the todos to the same state as itself. Make sure to clear the checked state after the "Clear completed" button is clicked. The "Mark all as complete" checkbox should also be updated when single todo items are checked/unchecked. Eg. When all the todos are checked it should also get checked.
+* Remove passing `todos` prop
+```jsx
+<Main 
+    todos={ this.state.todos }  // Remove this
+    ...
 
-![Mark all as complete](./images/mark_all_as_complete.png)
+<Footer 
+    todos={ this.state.todos }  // Remove this
 
-### ✅ Item
+```
 
-A todo item has three possible interactions:
+5. Create todo
+* Mutation and HOC
+```javascript
+const CREATE_TODO_MUTATION = gql`
+  mutation TodoCreate($data: TodoCreateInput!) {
+    todoCreate(data: $data) {
+      id
+      text
+      completed
+    }
+  }
+`;
 
-1. Clicking the checkbox marks the todo as complete by updating its `completed` value and toggling the class `completed` on its parent `<li>`
+const withCreateTodo = graphql(CREATE_TODO_MUTATION, {
+  props: ({ mutate }) => ({
+    createTodo: ({ text }) => {
+      mutate({
+        variables: { data: { text, completed: false } },
+        refetchQueries: [{ query: TODO_LIST_QUERY }]
+      });
+    }
+  })
+});
+```
+* Wrap `Header`
+```javascript
+Header = withCreateTodo(Header);
+```
+* Remove `createTodo` from App
+```jsx
+<Header 
+    createTodo={ this.createTodo }  // Remove this
+```
 
-2. Double-clicking the `<label>` activates editing mode, by toggling the `.editing` class on its `<li>`
+6. Toggle todo mutation
+* Mutation and HOC
+```javascript
+const TOGGLE_TODO_MUTATION = gql`
+  mutation TodoToggle($id: ID!, $completed: Boolean!) {
+    todoUpdate(filter: { id: $id }, data: {
+        completed: $completed
+    }) {
+      id
+      text
+      completed
+    }
+  }
+`;
 
-3. Hovering over the todo shows the remove button (`.destroy`)
+const withToggleTodo = graphql(TOGGLE_TODO_MUTATION, {
+  props: ({ mutate }) => ({
+    toggleTodo: ({ id, completed }) => {
+      mutate({
+        variables: { id, completed },
+        refetchQueries: [{ query: TODO_LIST_QUERY }]
+      });
+    }
+  })  
+});
+```
+* Wrap `Main` in `withToggleTodo`:
+```javascript
+Main = compose(
+  withRouter,
+  withTodos,
+  withToggleTodo  // Add this
+)(Main);
+```
+* Remove `toggleTodo` from App
+```jsx
+<Main 
+    toggleTodo={ this.toggleTodo }  // Remove this
+    ...
+```
 
-### ☑️ Editing
+7. Toggle all todos
+* Wrapp `App` in `withToggleTodo`
+```javascript
+App = withToggleTodo(App);
+```
 
-When editing mode is activated it will hide the other controls and bring forward an input that contains the todo title, which should be focused (`.focus()`). The edit should be saved on both blur and enter, and the `editing` class should be removed. Make sure to `.trim()` the input and then check that it's not empty. If it's empty the todo should instead be destroyed. If escape is pressed during the edit, the edit state should be left and any changes be discarded.
+* Change `toggleAllTodos` function in `App`
+```javascript
+toggleAllTodos = ({ completed }) => {
+  const { todos, toggleTodo } = this.state;
+  todos.forEach((todo) => {
+    toggleTodo({ id: todo.id, completed });
+  });
+  this.setState({ todos });
+}
+```
 
-### ☑️ Counter
+8. Remove todo
+* Mutation and HOC
+```javascript
+const DELETE_TODO_MUTATION = gql`
+  mutation TodoDelete($id: ID!) {
+    todoDelete(filter: { id: $id }) {
+      success
+    }
+  }
+`;
 
-Displays the number of active todos in a pluralized form. Make sure the number is wrapped by a `<strong>` tag. Also make sure to pluralize the `item` word correctly: `0 items`, `1 item`, `2 items`. Example: **2** items left
-
-### ☑️ Clear completed button
-
-Removes completed todos when clicked. Should be hidden when there are no completed todos.
-
-### ☑️ Persistence
-
-Your app should dynamically persist the todos to localStorage. If the framework has capabilities for persisting data (e.g. Backbone.sync), use that. Otherwise, use vanilla localStorage. If possible, use the keys `id`, `title`, `completed` for each item. Make sure to use this format for the localStorage name: `todos-[framework]`. Editing mode should not be persisted.
-
-### ✅ Routing
-
-Routing is required for all implementations. If supported by the framework, use its built-in capabilities. Otherwise, use the  [Flatiron Director](https://github.com/flatiron/director) routing library located in the `/assets` folder. The following routes should be implemented: `#/` (all - default), `#/active` and `#/completed` (`#!/` is also allowed). When the route changes, the todo list should be filtered on a model level and the `selected` class on the filter links should be toggled. When an item is updated while in a filtered state, it should be updated accordingly. E.g. if the filter is `Active` and the item is checked, it should be hidden. Make sure the active filter is persisted on reload.
-
-![Routing](./images/routing.png)
+const withRemoveTodo = graphql(DELETE_TODO_MUTATION, {
+  props: ({ mutate }) => ({
+    removeTodo: ( id ) => {
+      mutate({
+        variables: { id },
+        refetchQueries: [{ query: TODO_LIST_QUERY }]
+      });
+    }
+  })  
+});
+```
+* Wrap `Main` in `withRemoveTodo`
+```javascript
+Main = compose(
+  withRouter,
+  withTodos,
+  withToggleTodo,
+  withRemoveTodo // Add this
+)(Main);
+```
+* Remove `removeTodo` from `App`
+```jsx
+<Main 
+    removeTodo={ this.removeTodo }  // Remove this
+    ...
+```

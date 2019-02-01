@@ -128,11 +128,6 @@ class Header extends Component {
 
 class Main extends Component {
 
-  // toggleAllTodos = ({ completed }) => {
-  //   const { todos, toggleTodo } = this.props;
-  //   todos.forEach((todo) => toggleTodo({ id: todo.id, completed }));
-  // }
-
   render() {
     const {
       todos,
@@ -141,11 +136,6 @@ class Main extends Component {
       toggleAllTodos, // remove this
       location
     } = this.props;
-
-    // const toggleAllTodos = ({ completed }) => {
-    //   const { todos, toggleTodo } = this.props;
-    //   todos.forEach((todo) => toggleTodo({ id: todo.id, completed }));
-    // }
 
     return todos && todos.length ? (
       <section className="main">
@@ -302,6 +292,15 @@ class App extends Component {
     this.setState({ todos });
   }
 
+  // Replace with
+  // toggleAllTodos = ({ completed }) => {
+  //   const { todos, toggleTodo } = this.state;
+  //   todos.forEach((todo) => {
+  //     toggleTodo({ id: todo.id, completed });
+  //   });
+  //   this.setState({ todos });
+  // }
+
   toggleTodo = ({ id, completed }) => {
     const { todos } = this.state;
     todos.forEach((todo) => {
@@ -363,5 +362,7 @@ class App extends Component {
     );
   }
 }
+
+// App = withToggleTodo(App);
 
 export default App;
