@@ -55,7 +55,7 @@ const withCreateTodo = graphql(CREATE_TODO_MUTATION, {
 });
 
 
-const TOGGLE_TODO_QUERY = gql`
+const TOGGLE_TODO_MUTATION = gql`
   mutation TodoToggle($id: ID!, $completed: Boolean!) {
     todoUpdate(filter: { id: $id }, data: {
         completed: $completed
@@ -67,11 +67,30 @@ const TOGGLE_TODO_QUERY = gql`
   }
 `;
 
-const withToggleTodo = graphql(TOGGLE_TODO_QUERY, {
+const withToggleTodo = graphql(TOGGLE_TODO_MUTATION, {
   props: ({ mutate }) => ({
     toggleTodo: ({ id, completed }) => {
       mutate({
         variables: { id, completed },
+        refetchQueries: [{ query: TODO_LIST_QUERY }]
+      });
+    }
+  })  
+});
+
+const DELETE_TODO_MUTATION = gql`
+  mutation TodoDelete($id: ID!) {
+    todoDelete(filter: { id: $id }) {
+      success
+    }
+  }
+`;
+
+const withRemoveTodo = graphql(DELETE_TODO_MUTATION, {
+  props: ({ mutate }) => ({
+    removeTodo: ( id ) => {
+      mutate({
+        variables: { id },
         refetchQueries: [{ query: TODO_LIST_QUERY }]
       });
     }
@@ -178,7 +197,8 @@ class Main extends Component {
 Main = compose(
   withRouter,
   withTodos,
-  withToggleTodo
+  withToggleTodo,
+  withRemoveTodo
 )(Main);
 
 class Footer extends Component {
@@ -242,52 +262,6 @@ const authClient = new WebAuth0AuthClient({
 });
 
 class App extends Component {
-  constructor() {
-    super();
-    const todos = [
-      {
-        id: '1',
-        text: 'Todo 1',
-        completed: false
-      },
-      {
-        id: '2',
-        text: 'Todo 2',
-        completed: false
-      },
-      {
-        id: '3',
-        text: 'Todo 3',
-        completed: true
-      }
-    ];
-
-    this.state = { todos };
-  }
-
-  completeAllTodos = () => {
-    const { todos } = this.state;
-    todos.forEach((todo) => {
-      todo.completed = true;
-    });
-    this.setState({ todos });
-  }
-
-  uncompleteAllTodos = () => {
-    const { todos } = this.state;
-    todos.forEach((todo) => {
-      todo.completed = false;
-    });
-    this.setState({ todos });
-  }
-
-  removeTodo = (id) => {
-    let { todos } = this.state;
-    todos = todos.filter((todo) => {
-      return todo.id !== id;
-    });
-    this.setState({ todos });
-  }
 
   render() {
     return (
@@ -296,11 +270,8 @@ class App extends Component {
           {({ loading }) => loading ? <div>"Loading..."</div> : (
             <div className="todoapp">
               <Header />
-              <Main
-                completeAllTodos={this.completeAllTodos}
-                uncompleteAllTodos={this.uncompleteAllTodos}                
-                removeTodo={this.removeTodo} />
-              <Footer todos={this.state.todos} />
+              <Main />
+              <Footer />
             </div>
           )}
         </EightBaseAppProvider>
