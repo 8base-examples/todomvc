@@ -14,7 +14,7 @@ import "./App.css";
 
 const TODO_LIST_QUERY = gql`
   query TodoList {
-    todosList {
+    todosList(orderBy: [completed_ASC, createdAt_DESC]) {
       items {
         id
         text
@@ -43,12 +43,45 @@ const CREATE_TODO_MUTATION = gql`
   }
 `;
 
-const withCreateTodo
+const withCreateTodo = graphql(CREATE_TODO_MUTATION, {
+  props: ({ mutate }) => ({
+    createTodo: ({ text }) => {
+      mutate({
+        variables: { data: { text, completed: false } },
+        refetchQueries: [{ query: TODO_LIST_QUERY }]
+      });
+    }
+  })
+});
+
+
+const TOGGLE_TODO_QUERY = gql`
+  mutation TodoToggle($id: ID!, $completed: Boolean!) {
+    todoUpdate(filter: { id: $id }, data: {
+        completed: $completed
+    }) {
+      id
+      text
+      completed
+    }
+  }
+`;
+
+const withToggleTodo = graphql(TOGGLE_TODO_QUERY, {
+  props: ({ mutate }) => ({
+    toggleTodo: ({ id, completed }) => {
+      mutate({
+        variables: { id, completed },
+        refetchQueries: [{ query: TODO_LIST_QUERY }]
+      });
+    }
+  })  
+});
 
 class Header extends Component {
   state = { text: "" };
   render() {
-    const { onNewTodo } = this.props;
+    const { createTodo } = this.props;
     return (
       <header className="header">
         <h1>todos</h1>
@@ -59,7 +92,7 @@ class Header extends Component {
           }
           onKeyPress={({ key }) => {
             if (key === "Enter") {
-              onNewTodo({ text: this.state.text });
+              createTodo({ text: this.state.text });
               this.setState({ text: "" });
             }
           }}
@@ -71,13 +104,19 @@ class Header extends Component {
   }
 }
 
+Header = withCreateTodo(Header);
+
 
 class Main extends Component {
+
+  toggleAllTodos = ({ completed }) => {
+    const { todos, toggleTodo } = this.props;
+    todos.forEach((todo) => toggleTodo({ id: todo.id, completed }));
+  }
+
   render() {
     const {
       todos,
-      completeAllTodos,
-      uncompleteAllTodos,
       toggleTodo,
       removeTodo,
       location
@@ -89,8 +128,8 @@ class Main extends Component {
           type="checkbox"
           onChange={() =>
             todos.some(todo => todo.completed === false)
-              ? completeAllTodos()
-              : uncompleteAllTodos()
+              ? this.toggleAllTodos({ completed: true })
+              : this.toggleAllTodos({ completed: false })
           }
           checked={false}
         />
@@ -138,7 +177,8 @@ class Main extends Component {
 
 Main = compose(
   withRouter,
-  withTodos  
+  withTodos,
+  withToggleTodo
 )(Main);
 
 class Footer extends Component {
@@ -241,35 +281,10 @@ class App extends Component {
     this.setState({ todos });
   }
 
-  toggleTodo = ({ id, completed }) => {
-    const { todos } = this.state;
-    todos.forEach((todo) => {
-      if (todo.id === id) {
-        todo.completed = completed;
-      }
-    });
-    this.setState({ todos });
-  }
-
   removeTodo = (id) => {
     let { todos } = this.state;
     todos = todos.filter((todo) => {
       return todo.id !== id;
-    });
-    this.setState({ todos });
-  }
-
-  onNewTodo = ({ text }) => {
-    let { todos } = this.state;
-    const lastTodo = todos[todos.length - 1];
-    let newTodoId = 1;
-    if (lastTodo) {
-      newTodoId = parseInt(lastTodo.id, 10) + 1;
-    }
-    todos.push({
-      id: newTodoId.toString(),
-      text,
-      completed: false
     });
     this.setState({ todos });
   }
@@ -280,11 +295,10 @@ class App extends Component {
         <EightBaseAppProvider uri={ENDPOINT_URL} authClient={authClient} >
           {({ loading }) => loading ? <div>"Loading..."</div> : (
             <div className="todoapp">
-              <Header onNewTodo={this.onNewTodo} />
+              <Header />
               <Main
                 completeAllTodos={this.completeAllTodos}
-                uncompleteAllTodos={this.uncompleteAllTodos}
-                toggleTodo={this.toggleTodo}
+                uncompleteAllTodos={this.uncompleteAllTodos}                
                 removeTodo={this.removeTodo} />
               <Footer todos={this.state.todos} />
             </div>
