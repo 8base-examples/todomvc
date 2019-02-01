@@ -347,10 +347,10 @@ class App extends Component {
                   createTodo={ this.createTodo }            // Remove this
               />
               <Main 
-                  todos={ this.state.todos }                // Remove this
-                  toggleAllTodos={ this.toggleAllTodos }    // Remove this
+                  todos={ this.state.todos }                // Remove this                  
                   toggleTodo={ this.toggleTodo }            // Remove this
                   removeTodo={ this.removeTodo }            // Remove this
+                  toggleAllTodos={ this.toggleAllTodos }
                   />         
               <Footer 
                   todos={ this.state.todos }                // Remove this
