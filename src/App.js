@@ -363,6 +363,10 @@ class App extends Component {
   }
 }
 
-// App = withToggleTodo(App);
+// App = compose(
+//   withRouter,
+//   withTodos,
+//   withToggleTodo
+// )(App);
 
 export default App;
