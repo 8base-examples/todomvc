@@ -2,13 +2,16 @@ import React, { Component } from "react";
 import compose from "lodash/flowRight";
 import { HashRouter as Router, withRouter, Link } from "react-router-dom";
 
+import { EightBaseAppProvider } from '@8base/app-provider';
+import { WebAuth0AuthClient } from '@8base/web-auth0-auth-client';
+
 import "todomvc-app-css/index.css";
 import "./App.css";
 
 
 class Header extends Component {
   state = { text: "" };
-  render() {    
+  render() {
     const { onNewTodo } = this.props;
     return (
       <header className="header">
@@ -86,7 +89,7 @@ class Main extends Component {
                     className="destroy"
                   />
                 </div>
-                <input className="edit" onChange={() => {}} value={todo.text} />
+                <input className="edit" onChange={() => { }} value={todo.text} />
               </li>
             ))}
         </ul>
@@ -146,6 +149,17 @@ class Footer extends Component {
 
 Footer = compose(withRouter)(Footer);
 
+const ENDPOINT_URL = 'https://api.8base.com/cjrkt66qe000001ryzd3q4aiv'
+const AUTH_CLIENT_ID = 'qGHZVu5CxY5klivm28OPLjopvsYp0baD';
+const AUTH_DOMAIN = 'auth.8base.com';
+
+const authClient = new WebAuth0AuthClient({
+  domain: AUTH_DOMAIN,
+  clientId: AUTH_CLIENT_ID,
+  redirectUri: `${window.location.origin}/auth/callback`,
+  logoutRedirectUri: `${window.location.origin}/auth`,
+});
+
 class App extends Component {
   constructor() {
     super();
@@ -198,7 +212,7 @@ class App extends Component {
 
   removeTodo = (id) => {
     let { todos } = this.state;
-    todos = todos.filter(( todo ) => {
+    todos = todos.filter((todo) => {
       return todo.id !== id;
     });
     this.setState({ todos });
@@ -207,7 +221,7 @@ class App extends Component {
   onNewTodo = ({ text }) => {
     let { todos } = this.state;
     const lastTodo = todos[todos.length - 1];
-    let newTodoId = 1; 
+    let newTodoId = 1;
     if (lastTodo) {
       newTodoId = parseInt(lastTodo.id, 10) + 1;
     }
@@ -221,16 +235,20 @@ class App extends Component {
 
   render() {
     return (
-      <Router>    
-          <div className="todoapp">
-            <Header onNewTodo={ this.onNewTodo } />
-            <Main todos={ this.state.todos }
-                  completeAllTodos={ this.completeAllTodos }
-                  uncompleteAllTodos={ this.uncompleteAllTodos }
-                  toggleTodo={ this.toggleTodo }
-                  removeTodo={ this.removeTodo } />
-            <Footer todos={ this.state.todos } />
-          </div>        
+      <Router>
+        <EightBaseAppProvider uri={ENDPOINT_URL} authClient={authClient} >
+          {({ loading }) => loading ? <div>"Loading..."</div> : (
+            <div className="todoapp">
+              <Header onNewTodo={this.onNewTodo} />
+              <Main todos={this.state.todos}
+                completeAllTodos={this.completeAllTodos}
+                uncompleteAllTodos={this.uncompleteAllTodos}
+                toggleTodo={this.toggleTodo}
+                removeTodo={this.removeTodo} />
+              <Footer todos={this.state.todos} />
+            </div>
+          )}
+        </EightBaseAppProvider>
       </Router>
     );
   }
