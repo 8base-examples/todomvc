@@ -78,6 +78,19 @@ const withToggleTodo = graphql(TOGGLE_TODO_MUTATION, {
   })  
 });
 
+const withToggleAllTodos = graphql(TOGGLE_TODO_MUTATION, {
+  props: ({ mutate, ownProps: { todos }}) => ({
+    toggleAllTodos: ({ completed }) => {      
+      todos.forEach((todo) => {
+        mutate({
+          variables: { id: todo.id, completed },
+          refetchQueries: [{ query: TODO_LIST_QUERY }]
+        });        
+      });      
+    }
+  })
+});
+
 const DELETE_TODO_MUTATION = gql`
   mutation TodoDelete($id: ID!) {
     todoDelete(filter: { id: $id }) {
@@ -128,15 +141,12 @@ Header = withCreateTodo(Header);
 
 class Main extends Component {
 
-  toggleAllTodos = ({ completed }) => {
-    const { todos, toggleTodo } = this.props;
-    todos.forEach((todo) => toggleTodo({ id: todo.id, completed }));
-  }
 
   render() {
     const {
       todos,
       toggleTodo,
+      toggleAllTodos,
       removeTodo,
       location
     } = this.props;
@@ -147,8 +157,8 @@ class Main extends Component {
           type="checkbox"
           onChange={() =>
             todos.some(todo => todo.completed === false)
-              ? this.toggleAllTodos({ completed: true })
-              : this.toggleAllTodos({ completed: false })
+              ? toggleAllTodos({ completed: true })
+              : toggleAllTodos({ completed: false })
           }
           checked={false}
         />
@@ -198,6 +208,7 @@ Main = compose(
   withRouter,
   withTodos,
   withToggleTodo,
+  withToggleAllTodos,
   withRemoveTodo
 )(Main);
 
