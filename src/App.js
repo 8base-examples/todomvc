@@ -364,7 +364,6 @@ class App extends Component {
 }
 
 // App = compose(
-//   withRouter,
 //   withTodos,
 //   withToggleTodo
 // )(App);
