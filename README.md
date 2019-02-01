@@ -53,7 +53,7 @@ const authClient = new WebAuth0AuthClient({
 });
 ```
 
-**3. Wrap into `EightBaseAppProvider`**
+**3. Initialize `EightBaseAppProvider`**
 ```jsx
 <EightBaseAppProvider uri={ENDPOINT_URL} authClient={authClient} >
   {({ loading }) => loading ? <div>"Loading..."</div> : (
