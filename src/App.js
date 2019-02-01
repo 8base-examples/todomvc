@@ -5,9 +5,45 @@ import { HashRouter as Router, withRouter, Link } from "react-router-dom";
 import { EightBaseAppProvider } from '@8base/app-provider';
 import { WebAuth0AuthClient } from '@8base/web-auth0-auth-client';
 
+import gql from "graphql-tag";
+import { graphql } from "react-apollo";
+
 import "todomvc-app-css/index.css";
 import "./App.css";
 
+
+const TODO_LIST_QUERY = gql`
+  query TodoList {
+    todosList {
+      items {
+        id
+        text
+        completed
+      }
+    }
+  }
+`;
+
+const withTodos = graphql(TODO_LIST_QUERY, {
+  props: ({ data: { todosList: ({ items } = {}) } }) => {
+    return {
+      todos: items || []
+    };
+  },
+});
+
+
+const CREATE_TODO_MUTATION = gql`
+  mutation TodoCreate($data: TodoCreateInput!) {
+    todoCreate(data: $data) {
+      id
+      text
+      completed
+    }
+  }
+`;
+
+const withCreateTodo
 
 class Header extends Component {
   state = { text: "" };
@@ -34,6 +70,7 @@ class Header extends Component {
     );
   }
 }
+
 
 class Main extends Component {
   render() {
@@ -100,7 +137,8 @@ class Main extends Component {
 
 
 Main = compose(
-  withRouter
+  withRouter,
+  withTodos  
 )(Main);
 
 class Footer extends Component {
@@ -147,7 +185,10 @@ class Footer extends Component {
   }
 }
 
-Footer = compose(withRouter)(Footer);
+Footer = compose(
+  withRouter,
+  withTodos  
+)(Footer);
 
 const ENDPOINT_URL = 'https://api.8base.com/cjrkt66qe000001ryzd3q4aiv'
 const AUTH_CLIENT_ID = 'qGHZVu5CxY5klivm28OPLjopvsYp0baD';
@@ -240,7 +281,7 @@ class App extends Component {
           {({ loading }) => loading ? <div>"Loading..."</div> : (
             <div className="todoapp">
               <Header onNewTodo={this.onNewTodo} />
-              <Main todos={this.state.todos}
+              <Main
                 completeAllTodos={this.completeAllTodos}
                 uncompleteAllTodos={this.uncompleteAllTodos}
                 toggleTodo={this.toggleTodo}
