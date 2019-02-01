@@ -2,100 +2,100 @@ import React, { Component } from "react";
 import compose from "lodash/flowRight";
 import { HashRouter as Router, withRouter, Link } from "react-router-dom";
 
-import { EightBaseAppProvider } from '@8base/app-provider';
-import { WebAuth0AuthClient } from '@8base/web-auth0-auth-client';
+// import { EightBaseAppProvider } from '@8base/app-provider';
+// import { WebAuth0AuthClient } from '@8base/web-auth0-auth-client';
 
-import gql from "graphql-tag";
-import { graphql } from "react-apollo";
+// import gql from "graphql-tag";
+// import { graphql } from "react-apollo";
 
 import "todomvc-app-css/index.css";
 import "./App.css";
 
 
-const TODO_LIST_QUERY = gql`
-  query TodoList {
-    todosList(orderBy: [completed_ASC, createdAt_DESC]) {
-      items {
-        id
-        text
-        completed
-      }
-    }
-  }
-`;
+// const TODO_LIST_QUERY = gql`
+//   query TodoList {
+//     todosList(orderBy: [completed_ASC, createdAt_DESC]) {
+//       items {
+//         id
+//         text
+//         completed
+//       }
+//     }
+//   }
+// `;
 
-const withTodos = graphql(TODO_LIST_QUERY, {
-  props: ({ data: { todosList: ({ items } = {}) } }) => {
-    return {
-      todos: items || []
-    };
-  },
-});
-
-
-const CREATE_TODO_MUTATION = gql`
-  mutation TodoCreate($data: TodoCreateInput!) {
-    todoCreate(data: $data) {
-      id
-      text
-      completed
-    }
-  }
-`;
-
-const withCreateTodo = graphql(CREATE_TODO_MUTATION, {
-  props: ({ mutate }) => ({
-    createTodo: ({ text }) => {
-      mutate({
-        variables: { data: { text, completed: false } },
-        refetchQueries: [{ query: TODO_LIST_QUERY }]
-      });
-    }
-  })
-});
+// const withTodos = graphql(TODO_LIST_QUERY, {
+//   props: ({ data: { todosList: ({ items } = {}) } }) => {
+//     return {
+//       todos: items || []
+//     };
+//   },
+// });
 
 
-const TOGGLE_TODO_MUTATION = gql`
-  mutation TodoToggle($id: ID!, $completed: Boolean!) {
-    todoUpdate(filter: { id: $id }, data: {
-        completed: $completed
-    }) {
-      id
-      text
-      completed
-    }
-  }
-`;
+// const CREATE_TODO_MUTATION = gql`
+//   mutation TodoCreate($data: TodoCreateInput!) {
+//     todoCreate(data: $data) {
+//       id
+//       text
+//       completed
+//     }
+//   }
+// `;
 
-const withToggleTodo = graphql(TOGGLE_TODO_MUTATION, {
-  props: ({ mutate }) => ({
-    toggleTodo: ({ id, completed }) => {
-      mutate({
-        variables: { id, completed },
-        refetchQueries: [{ query: TODO_LIST_QUERY }]
-      });
-    }
-  })  
-});
+// const withCreateTodo = graphql(CREATE_TODO_MUTATION, {
+//   props: ({ mutate }) => ({
+//     createTodo: ({ text }) => {
+//       mutate({
+//         variables: { data: { text, completed: false } },
+//         refetchQueries: [{ query: TODO_LIST_QUERY }]
+//       });
+//     }
+//   })
+// });
 
-const DELETE_TODO_MUTATION = gql`
-  mutation TodoDelete($id: ID!) {
-    todoDelete(filter: { id: $id }) {
-      success
-    }
-  }
-`;
 
-const withRemoveTodo = graphql(DELETE_TODO_MUTATION, {
-  props: ({ mutate }) => ({
-    removeTodo: ( id ) => {
-      mutate({
-        variables: { id },
-        refetchQueries: [{ query: TODO_LIST_QUERY }]
-      });
-    }
-  })  
-});
+// const TOGGLE_TODO_MUTATION = gql`
+//   mutation TodoToggle($id: ID!, $completed: Boolean!) {
+//     todoUpdate(filter: { id: $id }, data: {
+//         completed: $completed
+//     }) {
+//       id
+//       text
+//       completed
+//     }
+//   }
+// `;
+
+// const withToggleTodo = graphql(TOGGLE_TODO_MUTATION, {
+//   props: ({ mutate }) => ({
+//     toggleTodo: ({ id, completed }) => {
+//       mutate({
+//         variables: { id, completed },
+//         refetchQueries: [{ query: TODO_LIST_QUERY }]
+//       });
+//     }
+//   })  
+// });
+
+// const DELETE_TODO_MUTATION = gql`
+//   mutation TodoDelete($id: ID!) {
+//     todoDelete(filter: { id: $id }) {
+//       success
+//     }
+//   }
+// `;
+
+// const withRemoveTodo = graphql(DELETE_TODO_MUTATION, {
+//   props: ({ mutate }) => ({
+//     removeTodo: ( id ) => {
+//       mutate({
+//         variables: { id },
+//         refetchQueries: [{ query: TODO_LIST_QUERY }]
+//       });
+//     }
+//   })  
+// });
 
 class Header extends Component {
   state = { text: "" };
