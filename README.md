@@ -1,6 +1,6 @@
 # 8base GraphQL + React Todo MVC
 
-[Todo MVC](http://todomvc.com/) app with 8base GraphQL backend
+[Todo MVC](http://todomvc.com/) app with 8base GraphQL backend walkthrough. If you don't want to go through steps you can find the result in the [8base](https://github.com/8base/MangoHacks/tree/8base) branch.
 
 
 # Preparing the environment
@@ -239,3 +239,5 @@ Main = compose(
     removeTodo={ this.removeTodo }  // Remove this
     ...
 ```
+
+Completed example with 8base backend connected can be found in the [8base](https://github.com/8base/MangoHacks/tree/8base) branch.
