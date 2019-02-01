@@ -31,7 +31,7 @@ module.exports = {
 ```
 
 # Connecting the backend
-1. Import graphql-related dependencies
+**1. Import graphql-related dependencies**
 ```javascript
 import gql from "graphql-tag";
 import { graphql } from "react-apollo";
@@ -39,7 +39,7 @@ import { EightBaseAppProvider } from '@8base/app-provider';
 import { WebAuth0AuthClient } from '@8base/web-auth0-auth-client';
 ```
 
-2. Initialize auth
+**2. Initialize auth**
 ```javascript
 const ENDPOINT_URL = 'YOUR_8BASE_ENDPOINT_URL'
 const AUTH_CLIENT_ID = 'qGHZVu5CxY5klivm28OPLjopvsYp0baD';
@@ -53,7 +53,7 @@ const authClient = new WebAuth0AuthClient({
 });
 ```
 
-3. Wrap into `EightBaseAppProvider`
+**3. Wrap into `EightBaseAppProvider`**
 ```jsx
 <EightBaseAppProvider uri={ENDPOINT_URL} authClient={authClient} >
   {({ loading }) => loading ? <div>"Loading..."</div> : (
@@ -62,7 +62,7 @@ const authClient = new WebAuth0AuthClient({
 </EightBaseAppProvider> 
 ```
 
-4. Fetch todos
+**4. Fetch todos**
 * Query and HOC
 ```javascript
 const TODO_LIST_QUERY = gql`
@@ -110,7 +110,7 @@ Footer = compose(
 
 ```
 
-5. Create todo
+**5. Create todo**
 * Mutation and HOC
 ```javascript
 const CREATE_TODO_MUTATION = gql`
@@ -144,7 +144,7 @@ Header = withCreateTodo(Header);
     createTodo={ this.createTodo }  // Remove this
 ```
 
-6. Toggle todo mutation
+**6. Toggle todo mutation**
 * Mutation and HOC
 ```javascript
 const TOGGLE_TODO_MUTATION = gql`
@@ -185,7 +185,7 @@ Main = compose(
     ...
 ```
 
-7. Toggle all todos
+**7. Toggle all todos**
 * Wrapp `App` in `withToggleTodo`
 ```javascript
 App = withToggleTodo(App);
@@ -202,7 +202,7 @@ toggleAllTodos = ({ completed }) => {
 }
 ```
 
-8. Remove todo
+**8. Remove todo**
 * Mutation and HOC
 ```javascript
 const DELETE_TODO_MUTATION = gql`
