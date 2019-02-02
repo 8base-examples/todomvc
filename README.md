@@ -8,7 +8,7 @@
 2. Create table `Todo` with fields `text` (field type: TEXT), `completed` (field type: SWITCH, format: Yes/No)
 3. Copy the API endpoint URL - you'll need it later where it says `8BASE_API_URL`
 4. Allow guest access to `Todo` table in Settings > Roles > Guest 
-5. Clone this repo 
+5. Clone this repo and run `git checkout workshop`
 6. Install dependencies: 
 ```
 yarn add @8base/app-provider @8base/web-auth0-auth-client graphql graphql-tag react-apollo && yarn
