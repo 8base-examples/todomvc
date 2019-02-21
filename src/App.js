@@ -3,7 +3,6 @@ import compose from "lodash/flowRight";
 import { HashRouter as Router, withRouter, Link } from "react-router-dom";
 
 import { EightBaseAppProvider } from '@8base/app-provider';
-import { WebAuth0AuthClient } from '@8base/web-auth0-auth-client';
 
 import gql from "graphql-tag";
 import { graphql } from "react-apollo";
@@ -261,23 +260,14 @@ Footer = compose(
   withTodos  
 )(Footer);
 
-const ENDPOINT_URL = 'https://api.8base.com/cjrkt66qe000001ryzd3q4aiv'
-const AUTH_CLIENT_ID = 'qGHZVu5CxY5klivm28OPLjopvsYp0baD';
-const AUTH_DOMAIN = 'auth.8base.com';
-
-const authClient = new WebAuth0AuthClient({
-  domain: AUTH_DOMAIN,
-  clientId: AUTH_CLIENT_ID,
-  redirectUri: `${window.location.origin}/auth/callback`,
-  logoutRedirectUri: `${window.location.origin}/auth`,
-});
+const ENDPOINT_URL = 'https://api.8base.com/cjnl68zy7000301qiqo5nhwql';
 
 class App extends Component {
 
   render() {
     return (
       <Router>
-        <EightBaseAppProvider uri={ENDPOINT_URL} authClient={authClient} >
+        <EightBaseAppProvider uri={ENDPOINT_URL} >
           {({ loading }) => loading ? <div>"Loading..."</div> : (
             <div className="todoapp">
               <Header />

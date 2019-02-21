@@ -3,9 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@8base/app-provider": "^0.10.5",
-    "@8base/auth": "^0.10.5",
-    "@8base/web-auth0-auth-client": "^0.10.5",
+    "@8base/app-provider": "^0.14.0",
     "graphql": "^14.1.1",
     "graphql-tag": "^2.10.1",
     "lodash": "^4.17.5",
