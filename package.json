@@ -1,7 +1,7 @@
 {
-  "name": "apollo-todomvc",
-  "version": "0.1.0",
-  "private": true,
+  "name": "8base-todomvc",
+  "version": "1.0.0",
+  "private": false,
   "dependencies": {
     "@8base/app-provider": "^0.15.0",
     "graphql": "^14.1.1",
@@ -10,8 +10,7 @@
     "react": "^16.8.3",
     "react-apollo": "^2.5.1",
     "react-dom": "^16.8.3",
-    "react-router-dom": "^4.2.2",
-    "react-scripts": "2.1.3",
+    "react-router-dom": "^4.2.2",  
     "todomvc-app-css": "^2.1.0"
   },
   "scripts": {
@@ -21,8 +20,7 @@
     "eject": "react-scripts eject"
   },
   "devDependencies": {
-    "enzyme": "^3.3.0",
-    "enzyme-adapter-react-16": "^1.1.1"
+    "react-scripts": "latest"
   },
   "browserslist": [
     ">0.2%",
