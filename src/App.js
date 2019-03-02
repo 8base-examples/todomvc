@@ -260,7 +260,7 @@ Footer = compose(
   withTodos  
 )(Footer);
 
-const ENDPOINT_URL = 'https://api.8base.com/cjnl68zy7000301qiqo5nhwql';
+const ENDPOINT_URL = 'https://api.8base.com/cjsrk2gxq000d01s06ye4s4vz';
 
 class App extends Component {
 
