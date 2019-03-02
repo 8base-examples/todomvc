@@ -24,7 +24,7 @@ const TODO_LIST_QUERY = gql`
 `;
 
 const withTodos = graphql(TODO_LIST_QUERY, {
-  props: ({ data: { todosList }) => {
+  props: ({ data: { todosList }}) => {
     let todos = []
     if (todosList) {
       todos = todosList.items;
